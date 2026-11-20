@@ -58,6 +58,8 @@
     $.each(res.site || {}, function (k, v) { if (v != null) CFG.site[k] = String(v); });
     CFG.payment = $.extend({}, CFG.payment);
     $.each(res.payment || {}, function (k, v) { if (v) CFG.payment[k] = String(v); });
+    // 試算表把手機號碼存成數字時，開頭的 0 會不見
+    if (/^9\d{8}$/.test(CFG.payment.phone_transfer || '')) CFG.payment.phone_transfer = '0' + CFG.payment.phone_transfer;
     API_PRODUCTS = res.products || [];
     lastSync = Date.now();
     return true;

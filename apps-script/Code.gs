@@ -86,7 +86,8 @@ function setup() {
   if (s.getLastRow() > 1) {
     s.getRange(2, 1, s.getLastRow() - 1, 1).getValues().forEach(function (r) { have[String(r[0]).trim()] = true; });
   }
-  DEFAULT_SETTINGS.forEach(function (row) { if (!have[row[0]]) s.appendRow(row); });
+  // 值前面加 ' 強制存成文字，電話號碼開頭的 0 才不會被吃掉
+  DEFAULT_SETTINGS.forEach(function (row) { if (!have[row[0]]) s.appendRow([row[0], "'" + row[1], row[2]]); });
   s.setColumnWidth(2, 320);
   s.setColumnWidth(3, 420);
 
@@ -141,6 +142,8 @@ function settings_() {
       if (k) out[k] = String(r[1] == null ? '' : r[1]).trim();
     });
   }
+  // 手機號碼被試算表當成數字、少了開頭的 0 時補回來
+  if (/^9\d{8}$/.test(out.phone_transfer)) out.phone_transfer = '0' + out.phone_transfer;
   return out;
 }
 
