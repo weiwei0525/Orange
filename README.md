@@ -62,6 +62,34 @@ url = https://script.google.com/macros/s/……/exec
 要 **部署 → 管理部署作業 → ✏ 編輯 → 版本選「新版本」→ 部署**，網址不會變。
 （只改試算表內容不需要這一步。）
 
+### LINE 推播（新訂單、匯款通知傳到 LINE）
+
+**A. 建立 LINE 官方帳號**
+1. 到 [LINE Official Account Manager](https://manager.line.biz/) 用 LINE 登入 → **建立 LINE 官方帳號**，名稱例如「有田有米訂單通知」，選免費方案。
+2. 進入帳號 → 右上 **設定** → 左側 **Messaging API** → **啟用 Messaging API** → 建立一個「服務提供者」（名稱隨意）。
+3. 同一頁的 **Webhook 網址** 填 Apps Script 網址（`https://script.google.com/macros/s/……/exec`）→ 儲存。
+4. 左側 **回應設定**：**Webhook 開啟**、**自動回應訊息 關閉**、加入好友的歡迎訊息可關閉。
+
+**B. 取得權杖**
+1. 到 [LINE Developers](https://developers.line.biz/console/) → 點剛剛的服務提供者 → 點官方帳號的 channel。
+2. **Messaging API** 分頁最下面 **Channel access token (long-lived)** → **Issue** → 複製那一長串。
+3. 貼到試算表「設定」分頁的 **`line_token`**。
+
+**C. 更新程式**（因為多了「連線到 LINE」的權限）
+1. 把新版 `Code.gs` 整份貼上覆蓋 → 儲存 → 執行 **`setup`** → 依提示重新授權。
+   「設定」分頁會多出 `line_token`、`line_bind_code`、`line_to` 三列。
+2. **部署 → 管理部署作業 → ✏ 編輯 → 版本選「新版本」→ 部署**（網址不變）。
+
+**D. 綁定接收者**（你和農婦各做一次）
+1. 用手機 LINE 掃官方帳號的 QR code 加好友（OA Manager 首頁 →「增加好友」）。
+2. 傳訊息給官方帳號：`綁定 驗證碼`（驗證碼在「設定」分頁的 `line_bind_code`，例如 `綁定 3WYK6S`）。
+3. 收到「✅ 綁定成功」就完成了。試算表選單 **🍊 橘子後台 → 傳送 LINE 測試訊息** 可以再確認一次。
+
+- 要停止接收：對官方帳號傳 `解除綁定`。
+- 驗證碼外流了：改掉 `line_bind_code`，再把 `line_to` 裡不認識的人刪掉。
+- 免費方案每月可推播 **200 則**，一則訊息傳給 2 個人算 2 則。超過額度時 LINE 不會推送，但訂單和 Email 照常。
+- LINE Developers 裡的 Webhook「Verify」按鈕可能顯示錯誤（Google 會轉址），可以忽略，直接用「綁定」訊息測試即可。
+
 ### 限制
 - 免費 Gmail 帳號每天最多寄約 100 封信。超過時訂單照樣成立，只是當天不會再寄信。
 - 改用後台之後，建議把原本的 Google 表單設成「不接受回應」，避免有人繞過網站直接填表單。
