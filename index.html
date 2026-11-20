@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>有田有米・有園有果｜東勢椪柑預購</title>
+  <meta name="description" content="青農農婦吳佳玲於台中東勢草生栽培的椪柑，不噴除草劑、手工割草。25斤裝含運直送，線上預購。">
+  <meta property="og:title" content="有田有米・有園有果｜東勢椪柑預購">
+  <meta property="og:description" content="草生栽培、不噴除草劑、手工割草。香甜帶酸、水分充足的東勢椪柑，25斤含運直送。">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://i.ytimg.com/vi/qSIf57bD0sc/hqdefault.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+</head>
+<body data-bs-spy="scroll" data-bs-target="#mainNav" data-bs-offset="80">
+
+<!-- 設定檔載入失敗時的提示（給店主看） -->
+<div id="cfgError" class="cfg-error" hidden>
+  <i class="bi bi-exclamation-triangle-fill"></i>
+  <div>讀不到 <code>config.ini</code>。直接雙擊 index.html（網址是 file:// 開頭）時，瀏覽器不允許讀檔。<br>
+  請改成雙擊資料夾裡的 <strong>start.bat</strong> 開啟，或上傳到網站主機。</div>
+  <button type="button" class="btn-close btn-close-white" aria-label="關閉" onclick="this.parentNode.hidden=true"></button>
+</div>
+
+<!-- ===== Navbar ===== -->
+<nav id="mainNav" class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="#top"><span class="brand-dot">🍊</span> 有田有米・有園有果</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="選單">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="#about">椪柑介紹</a></li>
+        <li class="nav-item"><a class="nav-link" href="#products">規格價格</a></li>
+        <li class="nav-item"><a class="nav-link" href="#flow">訂購流程</a></li>
+        <li class="nav-item"><a class="nav-link" href="#story">品牌故事</a></li>
+        <li class="nav-item" id="navGallery" hidden><a class="nav-link" href="#gallery">果園日常</a></li>
+        <li class="nav-item"><a class="nav-link" href="#faq">常見問題</a></li>
+        <li class="nav-item ms-lg-2"><button type="button" class="btn btn-outline-orange btn-sm px-3 my-1 my-lg-0" data-bs-toggle="modal" data-bs-target="#notifyModal"><i class="bi bi-send-check"></i> 匯款通知</button></li>
+        <li class="nav-item ms-lg-2"><a class="btn btn-orange btn-sm px-3 my-1 my-lg-0" href="#order">立即訂購</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<header id="top" class="hero">
+  <div class="hero-fall" aria-hidden="true"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center min-vh-hero">
+      <div class="col-lg-7 text-center text-lg-start">
+        <span class="badge rounded-pill hero-badge mb-3"><i class="bi bi-calendar-check"></i> <span data-cfg="site.season_badge">2026 季節限定・陸續出貨中</span></span>
+        <h1 class="hero-title">東勢山城的<br><span class="text-orange">酸甜椪柑</span></h1>
+        <p class="hero-lead">草生栽培、不噴除草劑、手工割草。<br class="d-none d-md-inline">香甜中帶點酸、水分飽滿，一口吃到回甘。</p>
+        <div class="d-flex gap-3 justify-content-center justify-content-lg-start flex-wrap">
+          <a href="#order" class="btn btn-orange btn-lg px-4"><i class="bi bi-bag-heart"></i> 我要訂購</a>
+          <a href="#products" class="btn btn-outline-dark btn-lg px-4">看規格價格</a>
+        </div>
+        <ul class="hero-tags list-unstyled d-flex gap-3 mt-4 justify-content-center justify-content-lg-start flex-wrap">
+          <li><i class="bi bi-truck"></i> 全台含運</li>
+          <li><i class="bi bi-box-seam"></i> 25 斤裝</li>
+          <li><i class="bi bi-geo-alt"></i> 台中東勢產地直送</li>
+        </ul>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="hero-orange" id="heroVisual"><div class="orange-ball"><span class="leaf"></span></div></div>
+      </div>
+    </div>
+  </div>
+  <a href="#about" class="scroll-hint" aria-label="往下"><i class="bi bi-chevron-double-down"></i></a>
+</header>
+
+<!-- 公告列（config.ini [site] notice） -->
+<div class="notice-bar" id="noticeBar" hidden>
+  <div class="container"><i class="bi bi-megaphone"></i> <span data-cfg="site.notice"></span></div>
+</div>
+
+<!-- ===== About ===== -->
+<section id="about" class="section">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <p class="eyebrow">ABOUT OUR PONKAN</p>
+      <h2 class="section-title">今年的椪柑</h2>
+      <p class="section-sub">十月即可採收，少量已黃熟，多數是八九分青綠、一兩分黃熟。<br class="d-none d-md-inline">所以酸度會偏高一些，但回甘非常明顯！</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-6 col-lg-3 reveal"><div class="feature-card"><div class="feature-icon"><i class="bi bi-flower1"></i></div><h3>草生栽培</h3><p>保留果園草相，讓土壤自然呼吸</p></div></div>
+      <div class="col-6 col-lg-3 reveal"><div class="feature-card"><div class="feature-icon"><i class="bi bi-scissors"></i></div><h3>手工割草</h3><p>不噴除草劑，一刀一刀親手整理</p></div></div>
+      <div class="col-6 col-lg-3 reveal"><div class="feature-card"><div class="feature-icon"><i class="bi bi-shield-check"></i></div><h3>安全用藥</h3><p>慣行農法，依規範安全用藥</p></div></div>
+      <div class="col-6 col-lg-3 reveal"><div class="feature-card"><div class="feature-icon"><i class="bi bi-droplet-half"></i></div><h3>香甜多汁</h3><p>甜中帶酸、水分充足，越吃越涮嘴</p></div></div>
+    </div>
+    <div class="info-strip reveal mt-5">
+      <div class="row text-center g-3">
+        <div class="col-md-4"><span class="label">品種</span><strong>椪柑</strong></div>
+        <div class="col-md-4"><span class="label">產地</span><strong>台中東勢 石城街珍東巷一帶</strong></div>
+        <div class="col-md-4"><span class="label">口感</span><strong>香甜・甜中帶酸・水分充足</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Products（由 config.ini 產生） ===== -->
+<section id="products" class="section section-tint">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <p class="eyebrow">PRODUCTS &amp; PRICE</p>
+      <h2 class="section-title">規格與價格</h2>
+      <p class="section-sub">價格皆<strong>含運費</strong>。「級數」指橘子的圓周，數字越大，橘子越大顆。</p>
+    </div>
+    <div class="row g-4 justify-content-center" id="productList">
+      <div class="col-12 text-center text-muted py-5"><div class="spinner-border text-warning"></div><p class="mt-2">商品載入中…</p></div>
+    </div>
+    <div class="calc-bar reveal mt-4" id="calcBar">
+      <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div>
+          <div class="calc-label">購物明細（含運）</div>
+          <div class="calc-detail" id="calcDetail">請在上方選擇箱數</div>
+        </div>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="calc-total">NT$ <span id="calcTotal">0</span></div>
+          <a href="#order" class="btn btn-orange btn-lg">填寫收件資料 <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Flow + Payment ===== -->
+<section id="flow" class="section">
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <p class="eyebrow">HOW TO ORDER</p>
+      <h2 class="section-title">訂購流程</h2>
+      <p class="section-sub">先匯款，再出貨。填寫帳號末五碼即可對帳，<strong>不用回傳匯款截圖</strong>。</p>
+    </div>
+    <div class="row g-4 flow">
+      <div class="col-6 col-lg-3 reveal"><div class="flow-step"><span class="num">1</span><i class="bi bi-cart-check"></i><h3>選擇箱數</h3><p>在網站選好規格<br>與數量</p></div></div>
+      <div class="col-6 col-lg-3 reveal"><div class="flow-step"><span class="num">2</span><i class="bi bi-cash-coin"></i><h3>匯款 / 轉帳</h3><p>依金額匯款到<br>下方帳戶</p></div></div>
+      <div class="col-6 col-lg-3 reveal"><div class="flow-step"><span class="num">3</span><i class="bi bi-send-check"></i><h3>填單或匯款通知</h3><p>填上帳號末五碼<br>農婦就能對帳</p></div></div>
+      <div class="col-6 col-lg-3 reveal"><div class="flow-step"><span class="num">4</span><i class="bi bi-truck"></i><h3>產地直送</h3><p>依採收狀態陸續出貨<br>請耐心等候</p></div></div>
+    </div>
+
+    <div class="row g-4 mt-2">
+      <div class="col-lg-4 reveal">
+        <div class="pay-card">
+          <div class="pay-head"><i class="bi bi-bank"></i> 銀行轉帳</div>
+          <p class="mb-1" data-cfg="payment.bank_name">中國信託（822）</p>
+          <p class="pay-no" data-cfg="payment.bank_account">7275-4024-6908</p>
+          <p class="text-muted small mb-3">戶名：<span data-cfg="payment.account_holder">吳佳玲</span></p>
+          <button class="btn btn-sm btn-outline-orange copy-btn" data-copy-cfg="payment.bank_account" data-digits="1"><i class="bi bi-clipboard"></i> 複製帳號</button>
+        </div>
+      </div>
+      <div class="col-lg-4 reveal">
+        <div class="pay-card">
+          <div class="pay-head"><i class="bi bi-phone"></i> 手機號碼轉帳</div>
+          <p class="mb-1">手機號碼即轉帳帳號</p>
+          <p class="pay-no" data-cfg="payment.phone_transfer">0987762621</p>
+          <p class="text-muted small mb-3">戶名：<span data-cfg="payment.account_holder">吳佳玲</span></p>
+          <button class="btn btn-sm btn-outline-orange copy-btn" data-copy-cfg="payment.phone_transfer" data-digits="1"><i class="bi bi-clipboard"></i> 複製號碼</button>
+        </div>
+      </div>
+      <div class="col-lg-4 reveal">
+        <div class="pay-card">
+          <div class="pay-head"><i class="bi bi-line"></i> LINE Pay</div>
+          <p class="mb-1">請加農婦個人 LINE</p>
+          <p class="pay-no" data-cfg="payment.line_id">mavis2731</p>
+          <p class="text-muted small mb-3">加好友後再進行付款</p>
+          <button class="btn btn-sm btn-outline-orange copy-btn" data-copy-cfg="payment.line_id"><i class="bi bi-clipboard"></i> 複製 LINE ID</button>
+        </div>
+      </div>
+    </div>
+    <div class="text-center mt-4 reveal">
+      <button type="button" class="btn btn-orange btn-lg" data-bs-toggle="modal" data-bs-target="#notifyModal"><i class="bi bi-send-check"></i> 已經匯款了？點這裡通知農婦</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Story ===== -->
+<section id="story" class="section section-green">
+  <div class="container">
+    <div class="row align-items-center g-4 g-lg-5">
+      <div class="col-lg-6 reveal">
+        <p class="eyebrow text-light-50">OUR STORY</p>
+        <h2 class="section-title text-white">從宜蘭稻田<br>到東勢果園</h2>
+        <p class="story-text">「有田有米」是青農<strong>吳佳玲（人稱農婦）</strong>創立的農業品牌。最初在宜蘭員山深溝村種稻、推廣米食文化，近年與丈夫轉往台中東勢、石岡一帶經營果園，種植柑橘、平地水蜜桃等作物。</p>
+        <p class="story-text">我們也開發無麩質米食點心——米蛋捲、米香、米穀粉，希望用友善的方式種植，把台灣在地的好味道分享給更多人。</p>
+        <div class="d-flex gap-2 flex-wrap mt-4">
+          <a class="btn btn-light" href="https://www.facebook.com/sweetrice039220412/" target="_blank" rel="noopener"><i class="bi bi-facebook"></i> Facebook 粉專</a>
+          <a class="btn btn-outline-light" href="https://www.youtube.com/@Ilona2888" target="_blank" rel="noopener"><i class="bi bi-youtube"></i> YouTube 頻道</a>
+        </div>
+      </div>
+      <div class="col-lg-6 reveal">
+        <div class="video-tabs nav nav-pills mb-3" role="tablist">
+          <button class="nav-link active" data-video="qSIf57bD0sc">採收椪柑要剪幾刀？</button>
+          <button class="nav-link" data-video="m6p1mtaNVLw">滾動吧椪柑！</button>
+        </div>
+        <div class="video-wrap ratio ratio-16x9" id="videoBox">
+          <button type="button" class="video-lite" data-id="qSIf57bD0sc" aria-label="播放影片">
+            <img src="https://i.ytimg.com/vi/qSIf57bD0sc/hqdefault.jpg" alt="果園影片" loading="lazy">
+            <span class="play"><i class="bi bi-play-fill"></i></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Gallery（config.ini [gallery] 有照片才顯示） ===== -->
+<section id="gallery" class="section" hidden>
+  <div class="container">
+    <div class="text-center mb-5 reveal">
+      <p class="eyebrow">ORCHARD DIARY</p>
+      <h2 class="section-title">果園日常</h2>
+      <p class="section-sub" data-cfg="gallery.subtitle">從採收到裝箱，每一顆都是農婦親手挑的</p>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</section>
+
+<!-- 照片放大 -->
+<div class="modal fade" id="lightbox" tabindex="-1" aria-label="照片" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content bg-transparent border-0">
+      <button type="button" class="btn-close btn-close-white lb-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+      <button type="button" class="lb-nav lb-prev" aria-label="上一張"><i class="bi bi-chevron-left"></i></button>
+      <img id="lbImg" class="lb-img" alt="">
+      <button type="button" class="lb-nav lb-next" aria-label="下一張"><i class="bi bi-chevron-right"></i></button>
+      <p class="lb-cap" id="lbCap"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== FAQ ===== -->
+<section id="faq" class="section">
+  <div class="container" style="max-width: 820px;">
+    <div class="text-center mb-5 reveal">
+      <p class="eyebrow">FAQ</p>
+      <h2 class="section-title">常見問題</h2>
+    </div>
+    <div class="accordion reveal" id="faqAcc">
+      <div class="accordion-item">
+        <h3 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#q1">為什麼橘子外皮還有點綠？</button></h3>
+        <div id="q1" class="accordion-collapse collapse show" data-bs-parent="#faqAcc"><div class="accordion-body">今年椪柑十月即可採收，多數是八九分青綠、一兩分黃熟。青綠不代表不能吃，只是酸度會偏高一些，但回甘很明顯。</div></div>
+      </div>
+      <div class="accordion-item">
+        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q2">什麼時候會出貨？</button></h3>
+        <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">開放訂購後陸續出貨，出貨節奏會依照採收狀態調整，需要大家耐心等待一下！訂購時可選擇方便收件的時間。</div></div>
+      </div>
+      <div class="accordion-item">
+        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q3">級數是什麼意思？</button></h3>
+        <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">級數指的是橘子的圓周，數字越大，橘子越大顆。</div></div>
+      </div>
+      <div class="accordion-item">
+        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q4">還沒匯款可以先下單嗎？</button></h3>
+        <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">可以！下單時選「稍後匯款」，匯款完成後再按上方的<strong>「匯款通知」</strong>填寫帳號末五碼即可。款項確認後才會出貨喔。</div></div>
+      </div>
+      <div class="accordion-item">
+        <h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#q5">匯款後需要傳截圖嗎？</button></h3>
+        <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faqAcc"><div class="accordion-body">不用！填寫<strong>帳號末五碼</strong>即可對帳。使用 LINE Pay 的朋友請先加農婦個人 LINE（<span data-cfg="payment.line_id">mavis2731</span>）。</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Order Form ===== -->
+<section id="order" class="section section-tint">
+  <div class="container" style="max-width: 860px;">
+    <div class="text-center mb-4 reveal">
+      <p class="eyebrow">ORDER</p>
+      <h2 class="section-title">填寫訂購單</h2>
+      <p class="section-sub">標示 <span class="text-danger">*</span> 為必填</p>
+    </div>
+
+    <div id="closedBox" class="closed-box reveal" hidden>
+      <div class="display-5 mb-2">🍊</div>
+      <p class="lead mb-0" data-cfg="site.closed_message">本季已結束，感謝支持！</p>
+    </div>
+
+    <form id="orderFormEl" class="order-card reveal" novalidate>
+      <h3 class="form-step"><span>1</span> 訂購品項</h3>
+      <div id="orderItems" class="mb-2"></div>
+      <div class="order-total mb-4">合計 <strong>NT$ <span id="orderTotal">0</span></strong> <small class="text-muted">（含運）</small></div>
+      <div class="invalid-msg" id="itemsError" hidden>請至少選擇 1 箱</div>
+
+      <h3 class="form-step"><span>2</span> 收件資料</h3>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label" for="fName">收件人姓名 <span class="text-danger">*</span></label>
+          <input class="form-control" id="fName" name="name" required autocomplete="name">
+          <div class="invalid-feedback">請填寫收件人姓名</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="fPhone">手機號碼 <span class="text-danger">*</span></label>
+          <input class="form-control" id="fPhone" name="phone" required inputmode="tel" pattern="09\d{2}-?\d{3}-?\d{3}" placeholder="09xx-xxx-xxx" autocomplete="tel">
+          <div class="invalid-feedback">請填寫正確的手機號碼（09 開頭 10 碼）</div>
+        </div>
+        <div class="col-12">
+          <label class="form-label" for="fAddress">收件地址 <span class="text-danger">*</span></label>
+          <input class="form-control" id="fAddress" name="address" required autocomplete="street-address">
+          <div class="invalid-feedback">請填寫收件地址</div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="fContact">LINE 帳號或 Email</label>
+          <input class="form-control" id="fContact" name="contact">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label d-block">方便收件的時間 <span class="text-danger">*</span></label>
+          <div id="timeOptions"></div>
+          <div class="invalid-msg" id="timeError" hidden>請選擇收件時間</div>
+        </div>
+      </div>
+
+      <h3 class="form-step"><span>3</span> 付款</h3>
+      <div class="pay-choice mb-3">
+        <input type="radio" class="btn-check" name="paystate" id="payDone" value="done" checked>
+        <label class="btn btn-outline-orange" for="payDone"><i class="bi bi-check2-circle"></i> 我已經匯款</label>
+        <input type="radio" class="btn-check" name="paystate" id="payLater" value="later">
+        <label class="btn btn-outline-orange" for="payLater"><i class="bi bi-clock-history"></i> 稍後匯款</label>
+      </div>
+      <div id="last5Box" class="mb-4">
+        <label class="form-label" for="fLast5">帳號末五碼 <span class="text-danger">*</span></label>
+        <input class="form-control last5-input" id="fLast5" name="last5" inputmode="numeric" maxlength="5" pattern="\d{5}" placeholder="例：46908">
+        <div class="form-text">LINE Pay 付款可填手機末五碼。</div>
+        <div class="invalid-feedback">請填寫 5 位數字</div>
+      </div>
+      <div id="laterHint" class="alert alert-warning small" hidden>
+        <i class="bi bi-info-circle"></i> 送出後請盡快匯款，並按「匯款通知」告訴農婦末五碼，<strong>確認款項後才會出貨</strong>。
+      </div>
+
+      <button type="submit" class="btn btn-orange btn-lg w-100" id="submitBtn"><i class="bi bi-send"></i> 送出訂單</button>
+      <p class="text-center small text-muted mt-3 mb-0">送不出去嗎？<a data-cfg-href="form.view_url" href="#" target="_blank" rel="noopener">改用 Google 表單填寫</a></p>
+    </form>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="footer-brand">🍊 有田有米・有園有果</div>
+        <p class="small mb-0">台中東勢・石岡｜友善耕作的柑橘與米食</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="https://www.facebook.com/sweetrice039220412/" target="_blank" rel="noopener" class="social" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="https://www.youtube.com/@Ilona2888" target="_blank" rel="noopener" class="social" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+        <span class="small d-block mt-2">LINE ID：<span data-cfg="payment.line_id">mavis2731</span></span>
+      </div>
+    </div>
+    <hr>
+    <p class="small text-center mb-0">© <span id="year"></span> 有田有米</p>
+  </div>
+</footer>
+
+<!-- ===== 訂單完成 Modal ===== -->
+<div class="modal fade" id="doneModal" tabindex="-1" aria-labelledby="doneTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center p-4">
+        <div class="done-icon"><i class="bi bi-check-lg"></i></div>
+        <h3 class="h4 fw-bold mt-3" id="doneTitle">訂單已送出！</h3>
+        <p class="text-muted mb-3">感謝您的支持，農婦確認後會依採收狀態陸續出貨 🍊</p>
+        <div class="done-summary text-start" id="doneSummary"></div>
+        <div id="doneLater" hidden>
+          <div class="alert alert-warning small text-start mt-3 mb-3">
+            您選擇「稍後匯款」，請匯款 <strong>NT$ <span id="doneAmount"></span></strong> 後按下方按鈕通知農婦。
+          </div>
+          <button type="button" class="btn btn-orange w-100 mb-2" id="doneNotifyBtn"><i class="bi bi-send-check"></i> 我已匯款，通知農婦</button>
+        </div>
+        <button type="button" class="btn btn-outline-secondary w-100" data-bs-dismiss="modal">關閉</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 匯款通知 Modal ===== -->
+<div class="modal fade" id="notifyModal" tabindex="-1" aria-labelledby="notifyTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title h5 fw-bold" id="notifyTitle"><i class="bi bi-send-check text-orange"></i> 匯款通知</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="關閉"></button>
+      </div>
+      <form id="notifyForm" novalidate>
+        <div class="modal-body">
+          <p class="small text-muted">匯款完成後填寫，讓農婦快速對帳，不用傳截圖。</p>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label" for="nName">訂購人姓名 <span class="text-danger">*</span></label>
+              <input class="form-control" id="nName" required>
+              <div class="invalid-feedback">必填</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label" for="nPhone">手機號碼 <span class="text-danger">*</span></label>
+              <input class="form-control" id="nPhone" required inputmode="tel" pattern="09\d{2}-?\d{3}-?\d{3}">
+              <div class="invalid-feedback">請填正確手機</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label" for="nAmount">匯款金額 <span class="text-danger">*</span></label>
+              <input class="form-control" id="nAmount" required inputmode="numeric" pattern="\d+">
+              <div class="invalid-feedback">請填數字</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label" for="nLast5">帳號末五碼 <span class="text-danger">*</span></label>
+              <input class="form-control last5-input" id="nLast5" required inputmode="numeric" maxlength="5" pattern="\d{5}">
+              <div class="invalid-feedback">5 位數字</div>
+            </div>
+            <div class="col-6">
+              <label class="form-label" for="nMethod">付款方式</label>
+              <select class="form-select" id="nMethod">
+                <option>銀行轉帳</option>
+                <option>手機號碼轉帳</option>
+                <option>LINE Pay</option>
+              </select>
+            </div>
+            <div class="col-6">
+              <label class="form-label" for="nDate">匯款日期</label>
+              <input type="date" class="form-control" id="nDate">
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="nNote">備註</label>
+              <textarea class="form-control" id="nNote" rows="2" placeholder="例：訂購 級數23 x2"></textarea>
+            </div>
+          </div>
+          <div class="notify-result mt-3" id="notifyResult" hidden></div>
+        </div>
+        <div class="modal-footer flex-column align-items-stretch gap-2">
+          <button type="submit" class="btn btn-orange" id="notifySubmit"><i class="bi bi-send"></i> 送出匯款通知</button>
+          <button type="button" class="btn btn-success" id="notifyLine"><i class="bi bi-line"></i> 改用 LINE 傳給農婦</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- 手機版浮動按鈕 / 回到頂端 -->
+<a href="#order" class="fab-order d-lg-none"><i class="bi bi-bag-heart"></i> 訂購<span class="fab-count" id="fabCount" hidden>0</span></a>
+<button type="button" class="to-top" aria-label="回到頂端"><i class="bi bi-arrow-up"></i></button>
+
+<!-- Toast -->
+<div class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3">
+  <div id="appToast" class="toast align-items-center text-bg-dark border-0" role="status" aria-live="polite">
+    <div class="d-flex"><div class="toast-body"><i class="bi bi-check-circle text-warning"></i> <span id="toastText">已複製</span></div></div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/js/ini.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
