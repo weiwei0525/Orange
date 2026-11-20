@@ -216,6 +216,24 @@ h1, h2, .section-title, .hero-title { font-family: "Noto Serif TC", "Noto Sans T
 .qty-input { width: 56px; text-align: center; border: 0; background: transparent; font-weight: 700; font-size: 1.15rem; -moz-appearance: textfield; }
 .qty-input::-webkit-inner-spin-button, .qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 .qty-input:focus { box-shadow: none; background: #fff; }
+/* 送出驗證時，箱數框不要套 Bootstrap 的綠框／打勾（會把數字擠掉） */
+.was-validated .qty-input:valid, .was-validated .qty-input:invalid,
+.qty-input.is-valid, .qty-input.is-invalid {
+  border: 0; background-image: none; padding-right: .75rem; box-shadow: none;
+}
+.was-validated .qty-input:valid:not(:focus), .was-validated .qty-input:invalid:not(:focus) { background-color: transparent; }
+/* 選填欄位空白時，不要顯示綠色打勾 */
+.was-validated .form-control:valid:placeholder-shown:not([required]) {
+  border-color: var(--bs-border-color); background-image: none; padding-right: .75rem;
+}
+.was-validated .form-control:valid:placeholder-shown:not([required]):focus { box-shadow: 0 0 0 .25rem rgba(240, 138, 36, .25); }
+/* 收件時間：不套綠色；沒選時顯示紅色 */
+.was-validated #timeOptions .form-check-input:valid { border-color: var(--bs-border-color); }
+.was-validated #timeOptions .form-check-input:valid:checked { background-color: var(--green); border-color: var(--green); }
+.was-validated #timeOptions .form-check-input:valid ~ .form-check-label { color: inherit; }
+#timeOptions.need-pick .form-check-input { border-color: var(--bs-form-invalid-border-color) !important; }
+/* 沒選箱數就送出時，讓品項區塊明顯提示 */
+#orderItems.need-pick .order-item { box-shadow: 0 0 0 2px rgba(220, 53, 69, .45); }
 
 .calc-bar { background: #fff; border-radius: 20px; padding: 1.3rem 1.6rem; box-shadow: var(--shadow); border-left: 6px solid var(--orange); }
 .calc-label { font-weight: 700; }

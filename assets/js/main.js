@@ -341,7 +341,7 @@
     });
     $('#calcDetail').html(lines.length ? lines.join('、') + '（共 ' + boxes + ' 箱）' : '請在上方選擇箱數');
     $('#fabCount').text(boxes).prop('hidden', boxes === 0);
-    if (boxes > 0) $('#itemsError').prop('hidden', true);
+    if (boxes > 0) { $('#itemsError').prop('hidden', true); $('#orderItems').removeClass('need-pick'); }
 
     // 金額跳動動畫
     $({ v: shownTotal }).stop(true).animate({ v: total }, {
@@ -386,6 +386,11 @@
       $('#fLast5').prop('required', !later);
     }).trigger('change');
 
+    $(document).on('change', 'input[name="time"]', function () {
+      $('#timeError').prop('hidden', true);
+      $('#timeOptions').removeClass('need-pick');
+    });
+
     $('#orderFormEl').on('submit', function (e) {
       e.preventDefault();
       var form = this, ok = form.checkValidity();
@@ -393,7 +398,9 @@
       var time = $('input[name="time"]:checked').val();
 
       $('#itemsError').prop('hidden', sums.boxes > 0);
+      $('#orderItems').toggleClass('need-pick', !sums.boxes);
       $('#timeError').prop('hidden', !!time);
+      $('#timeOptions').toggleClass('need-pick', !time);
       $(form).addClass('was-validated');
       if (!ok || !sums.boxes || !time) {
         var $first = $(form).find(':invalid').first();
