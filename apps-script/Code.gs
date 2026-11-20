@@ -44,22 +44,8 @@ var DEFAULT_PRODUCTS = [
 ];
 
 /* =================================================================
- *  試算表選單 / 初始化
+ *  初始化：第一次安裝時，上方下拉選單選「setup」→ 按 ▶ 執行
  * ================================================================= */
-function onOpen() {
-  SpreadsheetApp.getUi().createMenu('🍊 橘子後台')
-    .addItem('重新計算庫存', 'refreshStock')
-    .addItem('初始化／修復工作表', 'setup')
-    .addToUi();
-}
-
-// 改了訂單狀態或商品總箱數，就自動重算「已訂／剩餘」
-function onEdit(e) {
-  var name = e && e.range ? e.range.getSheet().getName() : '';
-  if (name === SHEET.orders || name === SHEET.products) refreshStock();
-}
-
-/** 第一次安裝時執行一次：建立工作表、表頭、預設商品與設定 */
 function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   ss.setSpreadsheetTimeZone(TZ);
@@ -110,6 +96,24 @@ function setup() {
   refreshStock();
   MailApp.getRemainingDailyQuota();  // 觸發寄信權限授權
   ss.toast('初始化完成！接著請按「部署 → 新增部署作業」。', '🍊 橘子後台', 8);
+}
+
+/* 試算表上方的「🍊 橘子後台」選單（開啟試算表時自動執行，不用手動按） */
+function onOpen() {
+  try {
+    SpreadsheetApp.getUi().createMenu('🍊 橘子後台')
+      .addItem('重新計算庫存', 'refreshStock')
+      .addItem('初始化／修復工作表', 'setup')
+      .addToUi();
+  } catch (e) {
+    console.log('onOpen 只在開啟試算表時有作用；第一次安裝請改執行 setup');
+  }
+}
+
+// 改了訂單狀態或商品總箱數，就自動重算「已訂／剩餘」
+function onEdit(e) {
+  var name = e && e.range ? e.range.getSheet().getName() : '';
+  if (name === SHEET.orders || name === SHEET.products) refreshStock();
 }
 
 function ensureSheet_(ss, name, head) {
