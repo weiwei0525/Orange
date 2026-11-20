@@ -34,14 +34,67 @@
     return $.Deferred().resolve().promise();
   }
 
+  /* ---------- 訂單後台 API（Google Apps Script） ---------- */
+  var API = '';              // config.ini [api] url；空白 = 用 Google 表單
+  var API_PRODUCTS = null;   // 後台回傳的商品（含即時庫存）
+  var lastSync = 0;
+
+  function apiFetch(opts, query) {
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 30000);
+    if (ctrl) opts.signal = ctrl.signal;
+    var url = API + (query ? (API.indexOf('?') < 0 ? '?' : '&') + query : '');
+    return fetch(url, opts)
+      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .finally(function () { clearTimeout(timer); });
+  }
+  function apiGet() { return apiFetch({ cache: 'no-store' }, 'action=config&t=' + Date.now()); }
+  // 用 text/plain 送出，瀏覽器不會先發 CORS 預檢，Apps Script 才收得到
+  function apiPost(data) { return apiFetch({ method: 'POST', body: JSON.stringify(data) }); }
+
+  function mergeApi(res) {
+    if (!res || !res.ok) return false;
+    CFG.site = $.extend({}, CFG.site);
+    $.each(res.site || {}, function (k, v) { if (v != null) CFG.site[k] = String(v); });
+    CFG.payment = $.extend({}, CFG.payment);
+    $.each(res.payment || {}, function (k, v) { if (v) CFG.payment[k] = String(v); });
+    API_PRODUCTS = res.products || [];
+    lastSync = Date.now();
+    return true;
+  }
+
   /* ---------- 讀取設定 ---------- */
   function loadConfig() {
     return $.ajax({ url: 'config.ini', dataType: 'text', cache: false })
-      .then(function (text) { CFG = INI.parse(text); })
-      .catch(function () { $('#cfgError').prop('hidden', false); CFG = {}; });
+      .then(function (text) { CFG = INI.parse(text); },
+            function () { $('#cfgError').prop('hidden', false); CFG = {}; return $.Deferred().resolve(); })
+      .then(function () {
+        API = cfg('api.url', '');
+        if (!API) return;
+        // 後台連不上時，先用 config.ini 的資料顯示；送單時後台仍會再檢查庫存
+        return apiGet().then(mergeApi).catch(function () { /* 用備用值 */ });
+      });
   }
 
-  function applyConfig() {
+  function makeProduct(id, p) {
+    var stock = Math.max(0, parseInt(p.stock, 10) || 0);
+    var max = Math.max(1, parseInt(p.max, 10) || 10);
+    return {
+      id: String(id), name: p.name || String(id), spec: p.spec || '',
+      price: parseInt(p.price, 10) || 0, stock: stock, max: max,
+      limit: Math.min(stock, max), badge: p.badge || '',
+      size: p.size === 'small' ? 'small' : 'big', entry: p.entry || '',
+      image: p.image || ''
+    };
+  }
+
+  function iniProducts() {
+    return Object.keys(CFG)
+      .filter(function (k) { return k.indexOf('product.') === 0 && CFG[k].enabled !== '0'; })
+      .map(function (k) { return makeProduct(k.slice(8), CFG[k]); });
+  }
+
+  function applyTexts() {
     $('[data-cfg]').each(function () {
       var v = cfg($(this).data('cfg'));
       if (v !== undefined) $(this).text(v);
@@ -50,35 +103,63 @@
       var v = cfg($(this).data('cfg-href'));
       if (v) $(this).attr('href', v);
     });
-    if (cfg('site.notice')) $('#noticeBar').prop('hidden', false);
+    $('#noticeBar').prop('hidden', !cfg('site.notice'));
+  }
 
-    PRODUCTS = Object.keys(CFG)
-      .filter(function (k) { return k.indexOf('product.') === 0 && CFG[k].enabled !== '0'; })
-      .map(function (k) {
-        var p = CFG[k];
-        var stock = Math.max(0, parseInt(p.stock, 10) || 0);
-        var max = Math.max(1, parseInt(p.max, 10) || 10);
-        return {
-          id: k.slice(8), name: p.name || k.slice(8), spec: p.spec || '',
-          price: parseInt(p.price, 10) || 0, stock: stock,
-          limit: Math.min(stock, max), badge: p.badge || '',
-          size: p.size === 'small' ? 'small' : 'big', entry: p.entry || '',
-          image: p.image || ''
-        };
-      });
+  function applyOpenState() {
+    var closed = cfg('site.open', '1') === '0';
+    $('#orderFormEl, #calcBar').prop('hidden', closed);
+    $('#closedBox').prop('hidden', !closed);
+    if (closed) $('.qty-group').addClass('disabled').find('button,input').prop('disabled', true);
+  }
+
+  function applyConfig() {
+    applyTexts();
+    if (API) {
+      $('.api-only').prop('hidden', false);
+      $('#fContactLabel').text('LINE ID／備註');
+      $('#formFallback').html('送不出去嗎？請用 LINE 聯絡農婦，LINE ID：<strong>' + esc(cfg('payment.line_id', '')) + '</strong>');
+    }
+    PRODUCTS = API_PRODUCTS
+      ? API_PRODUCTS.map(function (p) { return makeProduct(p.id, p); })
+      : iniProducts();
 
     renderHero();
     renderGallery();
     renderProducts();
     renderOrderItems();
     renderTimeOptions();
+    applyOpenState();
+  }
 
-    if (cfg('site.open', '1') === '0') {
-      $('#orderFormEl').prop('hidden', true);
-      $('#closedBox').prop('hidden', false);
-      $('#calcBar').prop('hidden', true);
-      $('.qty-group').addClass('disabled').find('button,input').prop('disabled', true);
-    }
+  /** 庫存有更新時重畫商品，並把已選的箱數夾在新的上限內 */
+  function setProducts(list) {
+    PRODUCTS = list.map(function (p) { return makeProduct(p.id, p); });
+    renderProducts();
+    renderOrderItems();
+    var keep = {};
+    PRODUCTS.forEach(function (p) {
+      var q = Math.min(p.limit, CART[p.id] || 0);
+      if (q > 0) keep[p.id] = q;
+      $('.qty-group[data-id="' + p.id + '"] .qty-input').val(q);
+      $('.qty-group[data-id="' + p.id + '"]').closest('.product-card').toggleClass('selected', q > 0);
+    });
+    CART = keep;
+    updateTotals();
+    applyOpenState();
+  }
+
+  // 客人切回這個分頁時，順便更新庫存（最多一分鐘一次）
+  function bindSync() {
+    $(document).on('visibilitychange', function () {
+      if (!API || document.hidden || Date.now() - lastSync < 60000) return;
+      lastSync = Date.now();
+      apiGet().then(function (res) {
+        if (!mergeApi(res)) return;
+        applyTexts();
+        setProducts(API_PRODUCTS);
+      }).catch(function () { /* 下次再試 */ });
+    });
   }
 
   /* ---------- 商品卡 ---------- */
@@ -341,39 +422,86 @@
         if (p.entry) params.append(p.entry, String(q));
         else extra.push(p.name + ' x' + q);  // 表單沒有對應題目時，附在聯絡欄位
       });
-      if (extra.length) data.contact = (data.contact ? data.contact + ' / ' : '') + '[其他品項] ' + extra.join('、');
+      data.later = later;
+      $('#orderAlert').prop('hidden', true).empty();
 
+      function finish() {
+        data.time_sent = new Date().toISOString();
+        store(LAST_ORDER_KEY, data);
+        showDone(data);
+        form.reset();
+        $(form).removeClass('was-validated');
+        $('input[name="paystate"]').trigger('change');
+        PRODUCTS.forEach(function (p) { setQty(p.id, 0); });
+      }
+      var $btn = $('#submitBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> 送出中…');
+      function resetBtn() { $btn.prop('disabled', false).html('<i class="bi bi-send"></i> 送出訂單'); }
+
+      // ---- 訂單後台：即時檢查庫存 ----
+      if (API) {
+        var payload = {
+          type: 'order', name: data.name, phone: data.phone, email: $('#fEmail').val().trim(),
+          address: data.address, contact: $('#fContact').val().trim(), time: time, later: later,
+          last5: later ? '' : $('#fLast5').val().trim(), items: {}, website: $('#fWebsite').val()
+        };
+        PRODUCTS.forEach(function (p) { if (CART[p.id]) payload.items[p.id] = CART[p.id]; });
+        apiPost(payload)
+          .then(function (res) {
+            if (res.products) setProducts(res.products);
+            if (!res.ok) { orderAlert(res); return; }
+            data.orderId = res.orderId;
+            data.total = res.total;
+            data.items = res.items;
+            data.emailed = res.emailed;
+            finish();
+          })
+          .catch(function () {
+            orderAlert({ message: '網路連線不穩，訂單可能沒有送出。請先確認是否收到確認信，或用 LINE 問農婦（' +
+              cfg('payment.line_id', '') + '），避免重複下單。' });
+          })
+          .finally(resetBtn);
+        return;
+      }
+
+      // ---- Google 表單 ----
+      if (extra.length) data.contact = (data.contact ? data.contact + ' / ' : '') + '[其他品項] ' + extra.join('、');
       ['name', 'phone', 'address', 'contact', 'time', 'last5'].forEach(function (k) {
         if (f[k] && data[k]) params.append(f[k], data[k]);
       });
+      if (!f.action) { resetBtn(); toast('尚未設定表單，請改用 Google 表單填寫'); return; }
 
-      if (!f.action) { toast('尚未設定表單，請改用 Google 表單填寫'); return; }
-
-      var $btn = $('#submitBtn').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> 送出中…');
       postToGoogle(f.action, params)
-        .then(function () {
-          data.time_sent = new Date().toISOString();
-          data.later = later;
-          store(LAST_ORDER_KEY, data);
-          showDone(data);
-          form.reset();
-          $(form).removeClass('was-validated');
-          $('input[name="paystate"]').trigger('change');
-          PRODUCTS.forEach(function (p) { setQty(p.id, 0); });
-        })
+        .then(finish)
         .catch(function () { toast('網路異常，請稍後再試或改用 Google 表單'); })
-        .finally(function () { $btn.prop('disabled', false).html('<i class="bi bi-send"></i> 送出訂單'); });
+        .finally(resetBtn);
     });
   }
 
+  function orderAlert(res) {
+    if (res.code === 'closed') {
+      CFG.site = $.extend({}, CFG.site, { open: '0', closed_message: res.message });
+      applyTexts();
+      applyOpenState();
+      $('html,body').animate({ scrollTop: $('#closedBox').offset().top - 120 }, 400);
+      return;
+    }
+    var title = res.code === 'stock' ? '<strong>庫存不足：</strong>' : '';
+    var tail = res.code === 'stock' ? '<br>數量已自動調整成目前可訂的箱數，確認後請再送出一次。' : '';
+    $('#orderAlert').prop('hidden', false).html(
+      '<div class="alert alert-danger small"><i class="bi bi-exclamation-triangle"></i> ' + title + esc(res.message || '送出失敗，請稍後再試') + tail + '</div>');
+    $('html,body').animate({ scrollTop: $('#orderAlert').offset().top - 160 }, 400);
+  }
+
   function showDone(d) {
-    var html = '<div><span>收件人</span>' + esc(d.name) + '</div>' +
+    var html = (d.orderId ? '<div><span>訂單編號</span><strong>' + esc(d.orderId) + '</strong></div>' : '') +
+      '<div><span>收件人</span>' + esc(d.name) + '</div>' +
       d.items.map(function (i) { return '<div><span>' + esc(i.name) + '</span>' + i.qty + ' 箱 × NT$ ' + money(i.price) + '</div>'; }).join('') +
       '<div class="total"><span>合計</span>NT$ ' + money(d.total) + '</div>' +
       '<div><span>末五碼</span>' + esc(d.last5) + '</div>';
     $('#doneSummary').html(html);
     $('#doneAmount').text(money(d.total));
     $('#doneLater').prop('hidden', !d.later);
+    $('#doneEmailed').prop('hidden', !d.emailed);
     bootstrap.Modal.getOrCreateInstance('#doneModal').show();
     burst();
   }
@@ -381,6 +509,7 @@
   /* ---------- 匯款通知 ---------- */
   function notifyData() {
     return {
+      orderId: API ? $('#nOrder').val().trim() : '',
       name: $('#nName').val().trim(), phone: $('#nPhone').val().replace(/\D/g, ''),
       amount: $('#nAmount').val().trim(), last5: $('#nLast5').val().trim(),
       method: $('#nMethod').val(), date: $('#nDate').val(), note: $('#nNote').val().trim()
@@ -388,6 +517,7 @@
   }
   function notifyMessage(d) {
     return '【匯款通知】有田有米\n' +
+      (d.orderId ? '訂單編號：' + d.orderId + '\n' : '') +
       '姓名：' + d.name + '\n手機：' + d.phone + '\n金額：NT$ ' + d.amount + '\n' +
       '末五碼：' + d.last5 + '\n方式：' + d.method + (d.date ? '\n日期：' + d.date : '') +
       (d.note ? '\n備註：' + d.note : '');
@@ -408,6 +538,7 @@
       $('#notifyForm').removeClass('was-validated');
       var last = store(LAST_ORDER_KEY);
       if (last) {
+        if (!$('#nOrder').val() && last.orderId) $('#nOrder').val(last.orderId);
         if (!$('#nName').val()) $('#nName').val(last.name);
         if (!$('#nPhone').val()) $('#nPhone').val(last.phone);
         if (!$('#nAmount').val()) $('#nAmount').val(last.total);
@@ -433,12 +564,20 @@
       e.preventDefault();
       if (!validNotify()) return;
       var d = notifyData(), n = CFG.notify || {};
-      if (!n.action) { sendViaLine(d); return; }  // 尚未建立通知表單 -> 走 LINE
+      if (!API && !n.action) { sendViaLine(d); return; }  // 沒有後台也沒有通知表單 -> 走 LINE
 
-      var params = new URLSearchParams();
-      Object.keys(d).forEach(function (k) { if (n[k] && d[k]) params.append(n[k], d[k]); });
+      var req;
+      if (API) {
+        req = apiPost($.extend({ type: 'notify' }, d)).then(function (res) {
+          if (!res.ok) throw new Error(res.message || '送出失敗');
+        });
+      } else {
+        var params = new URLSearchParams();
+        Object.keys(d).forEach(function (k) { if (n[k] && d[k]) params.append(n[k], d[k]); });
+        req = postToGoogle(n.action, params);
+      }
       var $btn = $('#notifySubmit').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> 送出中…');
-      postToGoogle(n.action, params)
+      req
         .then(function () {
           $('#notifyResult').prop('hidden', false).html(
             '<div class="alert alert-success small mb-0"><i class="bi bi-check-circle"></i> 已收到您的匯款通知！農婦對帳後會盡快安排出貨 🍊</div>');
@@ -446,7 +585,10 @@
           $('#notifyForm').removeClass('was-validated');
           burst();
         })
-        .catch(function () { toast('送出失敗，請改用 LINE 傳送'); })
+        .catch(function (err) {
+          var msg = err && err.message && !/fetch|network|abort|HTTP/i.test(err.message) ? err.message : '送出失敗';
+          toast(msg + '，請改用 LINE 傳送');
+        })
         .finally(function () { $btn.prop('disabled', false).html('<i class="bi bi-send"></i> 送出匯款通知'); });
     });
 
@@ -567,6 +709,7 @@
     bindOrder();
     bindNotify();
     bindGallery();
+    bindSync();
     loadConfig().always(applyConfig);
   });
 })(jQuery);

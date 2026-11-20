@@ -324,3 +324,7 @@ h1, h2, .section-title, .hero-title { font-family: "Noto Serif TC", "Noto Sans T
   .order-total { text-align: center; }
   .calc-bar .btn-lg { width: 100%; }
 }
+
+/* 防機器人欄位（畫面外） */
+.hp-field { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; opacity: 0; }
+#orderAlert .alert { margin-bottom: 1rem; }

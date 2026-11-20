@@ -361,8 +361,15 @@
           <div class="invalid-feedback">請填寫收件地址</div>
         </div>
         <div class="col-md-6">
-          <label class="form-label" for="fContact">LINE 帳號或 Email</label>
+          <div class="mb-3 api-only" hidden>
+            <label class="form-label" for="fEmail">Email <small class="text-muted">（填了會收到訂單確認信）</small></label>
+            <input type="email" class="form-control" id="fEmail" name="email" autocomplete="email" placeholder="name@example.com">
+            <div class="invalid-feedback">Email 格式不正確</div>
+          </div>
+          <label class="form-label" for="fContact" id="fContactLabel">LINE 帳號或 Email</label>
           <input class="form-control" id="fContact" name="contact">
+          <!-- 防機器人：真人看不到這一格 -->
+          <input type="text" name="website" id="fWebsite" tabindex="-1" autocomplete="off" class="hp-field" aria-hidden="true">
         </div>
         <div class="col-md-6">
           <label class="form-label d-block">方便收件的時間 <span class="text-danger">*</span></label>
@@ -388,8 +395,9 @@
         <i class="bi bi-info-circle"></i> 送出後請盡快匯款，並按「匯款通知」告訴農婦末五碼，<strong>確認款項後才會出貨</strong>。
       </div>
 
+      <div id="orderAlert" hidden></div>
       <button type="submit" class="btn btn-orange btn-lg w-100" id="submitBtn"><i class="bi bi-send"></i> 送出訂單</button>
-      <p class="text-center small text-muted mt-3 mb-0">送不出去嗎？<a data-cfg-href="form.view_url" href="#" target="_blank" rel="noopener">改用 Google 表單填寫</a></p>
+      <p class="text-center small text-muted mt-3 mb-0" id="formFallback">送不出去嗎？<a data-cfg-href="form.view_url" href="#" target="_blank" rel="noopener">改用 Google 表單填寫</a></p>
     </form>
   </div>
 </section>
@@ -422,6 +430,7 @@
         <div class="done-icon"><i class="bi bi-check-lg"></i></div>
         <h3 class="h4 fw-bold mt-3" id="doneTitle">訂單已送出！</h3>
         <p class="text-muted mb-3">感謝您的支持，農婦確認後會依採收狀態陸續出貨 🍊</p>
+        <p class="small text-success mb-3" id="doneEmailed" hidden><i class="bi bi-envelope-check"></i> 確認信已寄到您的 Email（沒看到請檢查垃圾郵件）</p>
         <div class="done-summary text-start" id="doneSummary"></div>
         <div id="doneLater" hidden>
           <div class="alert alert-warning small text-start mt-3 mb-3">
@@ -447,6 +456,10 @@
         <div class="modal-body">
           <p class="small text-muted">匯款完成後填寫，讓農婦快速對帳，不用傳截圖。</p>
           <div class="row g-3">
+            <div class="col-12 api-only" hidden>
+              <label class="form-label" for="nOrder">訂單編號 <small class="text-muted">（選填，例：1121-003）</small></label>
+              <input class="form-control" id="nOrder" maxlength="20" placeholder="在訂單確認信或完成畫面上">
+            </div>
             <div class="col-6">
               <label class="form-label" for="nName">訂購人姓名 <span class="text-danger">*</span></label>
               <input class="form-control" id="nName" required>
