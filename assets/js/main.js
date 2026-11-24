@@ -120,7 +120,8 @@
     if (API) {
       $('.api-only').prop('hidden', false);
       $('#fContactLabel').text('LINE ID／備註');
-      $('#formFallback').html('送不出去嗎？請用 LINE 聯絡農婦，LINE ID：<strong>' + esc(cfg('payment.line_id', '')) + '</strong>');
+      $('#fContactHelp').text('出貨通知、或有特別交代（例：放管理室）都可以寫這裡。');
+      $('#formFallback').html('不方便填表或送不出去？也可以直接 LINE 農婦，LINE ID：<strong>' + esc(cfg('payment.line_id', '')) + '</strong>');
     }
     PRODUCTS = API_PRODUCTS
       ? API_PRODUCTS.map(function (p) { return makeProduct(p.id, p); })
@@ -340,7 +341,8 @@
       }
     });
     $('#calcDetail').html(lines.length ? lines.join('、') + '（共 ' + boxes + ' 箱）' : '請在上方選擇箱數');
-    $('#fabCount').text(boxes).prop('hidden', boxes === 0);
+    $('#fabCount').text(boxes ? '已選 ' + boxes + ' 箱' : '').prop('hidden', boxes === 0);
+    $('#fabOrder').attr('aria-label', boxes ? '前往訂購單，已選 ' + boxes + ' 箱' : '前往訂購單');
     if (boxes > 0) { $('#itemsError').prop('hidden', true); $('#orderItems').removeClass('need-pick'); }
 
     // 金額跳動動畫
